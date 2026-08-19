@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+.pytest_cache/
+.venv/
+.env
+.DS_Store
+
+# generated corpora
+data/
+
+# downloaded by scripts/setup_soundfont.sh
+soundfonts/*.sf2
+soundfonts/*.sf3
