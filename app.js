@@ -293,8 +293,18 @@ async function renderSingle() {
   await mountMedia(els.score, els.audioSlot, piece, piece._dir);
 }
 
+// Engraving is synchronous and heavy; at corpus scale a compare grid can hold
+// 40+ models, which would freeze the tab for its whole build. Yield to the
+// browser between cards so the grid fills progressively and stays responsive —
+// and bail out if the user changed the selection mid-build.
+let renderGeneration = 0;
+function yieldToBrowser() {
+  return new Promise((r) => setTimeout(r, 0));
+}
+
 // One column per model available for the current prompt + generation method.
 async function renderCompare() {
+  const gen = ++renderGeneration;
   els.grid.innerHTML = "";
   let first = null;
   for (const m of optionsFor("model", Object.assign({}, SEL, { model: null }))) {
@@ -302,12 +312,15 @@ async function renderCompare() {
     if (!piece) continue;
     first = first || piece;
     await addCompareCard(piece, piece._dir, m);
+    await yieldToBrowser();
+    if (gen !== renderGeneration) return; // selection changed mid-build
   }
   updatePromptPanel(first);
 }
 
 // One column per generation method available for the current prompt + model.
 async function renderCompareMethods() {
+  const gen = ++renderGeneration;
   els.grid.innerHTML = "";
   let first = null;
   for (const mo of optionsFor("mode", Object.assign({}, SEL, { mode: null }))) {
@@ -315,6 +328,8 @@ async function renderCompareMethods() {
     if (!piece) continue;
     first = first || piece;
     await addCompareCard(piece, piece._dir, modeLabel(mo));
+    await yieldToBrowser();
+    if (gen !== renderGeneration) return; // selection changed mid-build
   }
   updatePromptPanel(first);
 }
