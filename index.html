@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How do LLMs express themselves musically?</title>
+  <!-- Verovio engraves MusicXML (code-gen); abcjs engraves + plays raw ABC;
+       html-midi-player plays code-gen pieces from their MIDI (no server audio). -->
+  <script src="https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/abcjs-audio.css" />
+  <link rel="stylesheet" href="style.css?v=1" />
+</head>
+<body>
+  <header>
+    <h1>How do LLMs express themselves musically?</h1>
+    <p class="sub">
+      Each piece was generated once by a language model, asked only to express
+      itself — written either as <a href="https://abcnotation.com/">ABC</a> (a compact
+      plain-text music notation) or as Python code that builds the score
+      (&ldquo;code-gen&rdquo;). Notation is engraved (typeset) and played live in your
+      browser with <a href="https://www.verovio.org/">Verovio</a> and
+      <a href="https://www.abcjs.net/">abcjs</a>.
+      The experimental design descends from
+      <a href="https://github.com/sara-fish/llm-musical-self-expression">sara-fish/llm-musical-self-expression</a>.
+    </p>
+  </header>
+
+  <nav class="controls">
+    <!-- The three selectors cross-filter the pooled pieces from every batch:
+         each dropdown lists the values available given the other two. The
+         "Piece" picker appears only when a combination has several samples. -->
+    <label id="mode-label">Generation
+      <select id="mode"></select>
+    </label>
+    <label>Prompt
+      <select id="prompt"></select>
+    </label>
+    <label id="model-label">Model
+      <select id="model"></select>
+    </label>
+    <label id="variant-label" hidden>Piece
+      <select id="variant"></select>
+    </label>
+    <label class="toggle">Compare models
+      <input type="checkbox" id="compare" />
+    </label>
+    <label class="toggle" id="compare-gen-label">Compare methods
+      <input type="checkbox" id="compare-gen" />
+    </label>
+  </nav>
+
+  <details id="prompt-panel">
+    <summary>Prompt sent to the model <span id="prompt-mode" class="tag"></span></summary>
+    <div class="prompt-body">
+      <p class="note">System</p>
+      <pre id="sys-prompt"></pre>
+      <p class="note">User</p>
+      <pre id="user-prompt"></pre>
+    </div>
+  </details>
+
+  <main>
+    <!-- single-piece view -->
+    <section id="single">
+      <section id="meta">
+        <h2 id="title">—</h2>
+        <p id="when" class="note"></p>
+        <p id="short" class="short"></p>
+        <div id="audio-slot"></div>
+        <details id="long-wrap">
+          <summary>Model's reflection</summary>
+          <p id="long"></p>
+        </details>
+        <p id="status" class="note"></p>
+      </section>
+      <section id="score" aria-label="engraved score"></section>
+    </section>
+
+    <!-- compare view: one column per model for the current prompt -->
+    <section id="compare-grid" hidden></section>
+  </main>
+
+  <script src="app.js?v=1" defer></script>
+</body>
+</html>

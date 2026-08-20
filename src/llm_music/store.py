@@ -5,6 +5,7 @@ Layout:
   data/<ts>__models_N_prompts_M/
     data.json
     audio/<prompt>/<model>.mp3
+    midi/<prompt>/<model>.mid
     scores/<prompt>/<model>.musicxml
 """
 
@@ -72,6 +73,13 @@ def append_result(batch: Path, result: PieceResult, sample: int = 0) -> dict:
         score_rel = f"scores/{r.prompt}/{r.model}{suffix}.musicxml"
         _copy(r.musicxml_path, batch / score_rel)
         entry["score"] = score_rel
+    if r.ok and r.midi_path and r.midi_path.is_file():
+        # The MIDI is what the audio is rendered from; keeping it lets the
+        # static site synthesize playback client-side, so the published corpus
+        # doesn't need to ship MP3s.
+        midi_rel = f"midi/{r.prompt}/{r.model}{suffix}.mid"
+        _copy(r.midi_path, batch / midi_rel)
+        entry["midi"] = midi_rel
     if r.ok and r.audio_path:
         audio_rel = f"audio/{r.prompt}/{r.model}{suffix}.mp3"
         _copy(r.audio_path, batch / audio_rel)

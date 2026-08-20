@@ -7,8 +7,12 @@ dist/
 .env
 .DS_Store
 
-# generated corpora
+# locally generated batches — remove this line when the curated paper corpus
+# is imported, so data/ ships with the repo and the browse site can serve it
 data/
+# pre-baked MP3s never ship regardless: the site engraves scores and
+# synthesizes audio client-side, so the repo stores only symbolic files
+data/*/audio/
 
 # downloaded by scripts/setup_soundfont.sh
 soundfonts/*.sf2

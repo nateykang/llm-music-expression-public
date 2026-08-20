@@ -1,5 +1,9 @@
 # LLM Musical Self-Expression — Generation Pipeline
 
+**[▶ Browse the corpus](https://nateykang.github.io/REPO-NAME/)** — every piece's
+sheet music and audio, rendered live in your browser (nothing to install).
+<!-- TODO: replace REPO-NAME with the final repository name when Pages is enabled -->
+
 *How do LLMs express themselves musically?* This repository contains the data-generation
 pipeline used for the paper: it prompts language models to compose music in symbolic
 formats, renders their pieces to MusicXML/MIDI/MP3, and bakes everything into
