@@ -183,6 +183,70 @@ def cmd_redescribe(args) -> int:
     return 0 if not failed else 1
 
 
+def cmd_analyze(args) -> int:
+    from collections import Counter
+    from statistics import mean
+
+    from .analyze import analyze_batch, write_csv
+
+    if args.all:
+        base = Path(args.data_dir)
+        batches = sorted(p for p in base.iterdir() if p.is_dir() and (p / "data.json").exists())
+        if not batches:
+            print(f"no batches under {base}")
+            return 1
+        total = 0
+        for b in batches:
+            rows = analyze_batch(b)
+            if rows:
+                write_csv(rows, b / "features.csv")
+            total += len(rows)
+            print(f"  {b.name}: {len(rows)} rows", flush=True)
+        print(f"Wrote features for {total} pieces across {len(batches)} batches")
+        return 0
+    if not args.batch:
+        print("error: give a batch path or use --all", file=sys.stderr)
+        return 2
+    batch = Path(args.batch)
+    rows = analyze_batch(batch)
+    if not rows:
+        print(f"no analyzable pieces in {batch}")
+        return 1
+    out = batch / "features.csv"
+    write_csv(rows, out)
+    print(f"Wrote {len(rows)} rows → {out}\n")
+
+    # Inductive-bias readout: per-model defaults for one prompt.
+    ff = [r for r in rows if r["prompt"] == args.summary_prompt] or rows
+    scope = (args.summary_prompt if any(r["prompt"] == args.summary_prompt for r in rows)
+             else "all prompts")
+    print(f"=== Per-model defaults ({scope}) ===")
+    by_model: dict[str, list] = {}
+    for r in ff:
+        by_model.setdefault(r["model"], []).append(r)
+    for model, rs in sorted(by_model.items()):
+        modes = [r["key_mode_best"] for r in rs if r.get("key_mode_best")]
+        minor = (sum(m == "minor" for m in modes) / len(modes)) if modes else 0
+        matches = [r["mode_match"] for r in rs if r.get("mode_match") not in (None, "")]
+        match = (sum(int(x) for x in matches) / len(matches)) if matches else None
+        keys = Counter(f"{r['key_declared_tonic'] or r['key_tonic']} {m}"
+                       for r, m in zip(rs, (r.get("key_mode_best") or "?" for r in rs))).most_common(2)
+        scales = [r["scale_consistency"] for r in rs if r["scale_consistency"] is not None]
+        # valence can be None (unknown mode) and tempo_bpm blank (never declared,
+        # v3 features) — both must drop out of the means, not crash them.
+        vals = [r["valence"] for r in rs if isinstance(r["valence"], (int, float))]
+        tempos = [r["tempo_bpm"] for r in rs if isinstance(r["tempo_bpm"], (int, float))]
+        print(
+            f"  {model:24} n={len(rs):3d}  minor={minor:.0%}  "
+            f"mode_match={'—' if match is None else f'{match:.0%}'}  "
+            f"valence={'—' if not vals else f'{mean(vals):+.2f}'}  "
+            f"tempo={'—' if not tempos else f'{mean(tempos):3.0f}'}  "
+            f"scale_consist={(sum(scales)/len(scales) if scales else 0):.2f}  "
+            f"top_keys={keys}"
+        )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="llm-music", description=__doc__)
     p.add_argument("-q", "--quiet", action="store_true",
@@ -233,6 +297,16 @@ def build_parser() -> argparse.ArgumentParser:
     pd.add_argument("--force", action="store_true",
                     help="regenerate descriptions that already have this treatment")
     pd.set_defaults(func=cmd_redescribe)
+
+    pa = sub.add_parser("analyze",
+                        help="extract the objective feature panel from a batch → features.csv")
+    pa.add_argument("batch", nargs="?", help="path to a data/<batch> folder")
+    pa.add_argument("--all", action="store_true",
+                    help="re-analyze every batch under --data-dir (run after metric changes)")
+    pa.add_argument("--data-dir", default="data")
+    pa.add_argument("--summary-prompt", default="express-yourself",
+                    help="prompt to base the per-model bias readout on")
+    pa.set_defaults(func=cmd_analyze)
     return p
 
 
