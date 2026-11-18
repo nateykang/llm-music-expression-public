@@ -1,6 +1,6 @@
 # Composer listening notes: model comparison — 2026-10-08
 
-Blind notes by Caio (composer) comparing the three models on the code-generated pieces of the three paper prompts (see also the [generation method notes](caio_2026-08-28_generation_method.md)). Models are identified only by letter; each note covers one piece position across the three prompts. Position-to-letter mapping:
+Notes from Caio (professional composer) comparing the three models on music21 pieces of the three different "express yourself" prompts. Models were identified only by letter during listening and writing notes. Model A is gemini-3.7-flash, Model B is fable-5, and Model C is gpt-5.6. Please refer to [caio_2026-08-28_generation_method.md](caio_2026-08-28_generation_method.md) for Caio's generation method notes.
 
 | Prompt | Piece 1 | Piece 2 | Piece 3 |
 |---|---|---|---|

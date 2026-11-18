@@ -1,6 +1,6 @@
 # Composer listening notes: generation method — 2026-08-28
 
-Blind notes by Caio (composer) comparing the two generation methods (music21 code vs ABC notation) for the same model and prompt. Models are identified only by letter; the letters match the [model comparison notes](caio_2026-10-08_model_comparison.md).
+Notes from Caio (professional composer) comparing the two generation methods (music21 code vs ABC notation) for the same model and prompt. Models were identified only by letter during listening and writing notes. Model A is gemini-3.7-flash, Model B is fable-5, and Model C is gpt-5.6. Please refer to [caio_2026-10-08_model_comparison.md](caio_2026-10-08_model_comparison.md) for Caio's model comparison notes.
 
 ## Code vs ABC · Model A · Express yourself
 
