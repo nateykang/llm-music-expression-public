@@ -1,6 +1,6 @@
-# Composer listening notes — 2026-10-08
+# Composer listening notes: model comparison — 2026-10-08
 
-Blind notes by Caio (composer) on the code-generated pieces of the three paper prompts. Models are identified only by letter; each note covers one piece position across the three prompts. Position-to-letter mapping:
+Blind notes by Caio (composer) comparing the three models on the code-generated pieces of the three paper prompts (see also the [generation method notes](caio_2026-08-28_generation_method.md)). Models are identified only by letter; each note covers one piece position across the three prompts. Position-to-letter mapping:
 
 | Prompt | Piece 1 | Piece 2 | Piece 3 |
 |---|---|---|---|
